@@ -1,32 +1,35 @@
 Heroku buildpack: Perl
 ======================
 
-This is a Heroku buildpack that runs any PSGI based web applications using Starman.
+This is a Heroku buildpack that runs Mojolicious based web applications using Perloku executable file.
 
 Usage
 -----
 
 Example usage:
 
-    $ ls
+    $ ls -F
+    Perloku*
+    app.pl*
     cpanfile
-    app.psgi
-    lib/
 
     $ cat cpanfile
-    requires 'Plack', '1.0000';
-    requires 'DBI', '1.6';
+    requires 'Mojolicious', '7.14';
 
-    $ heroku create --stack cedar --buildpack https://github.com/miyagawa/heroku-buildpack-perl.git
+    $ cat Perloku
+    #!/bin/sh
+    ./app.pl daemon --listen http://*:$PORT
+
+    $ heroku create --stack cedar --buildpack https://github.com/keedi/heroku-buildpack-perl.git
 
     $ git push heroku master
     ...
     -----> Heroku receiving push
     -----> Fetching custom buildpack
-    -----> Perl/PSGI app detected
+    -----> Perloku app detected
     -----> Installing dependencies
 
-The buildpack will detect that your app has an `app.psgi` in the root.
+The buildpack will detect that your app has an `Perloku` in the root.
 
 Libraries
 ---------

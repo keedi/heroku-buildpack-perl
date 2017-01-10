@@ -40,8 +40,8 @@ echo "-----> Installing dependencies"
 echo "cpanm options: $PERL_CPANM_OPT" | indent
 cpanm --installdeps . 2>&1 | indent
 
-echo "-----> Installing Starman"
-cpanm Starman 2>&1 | indent
+echo "-----> Installing local::lib"
+cpanm local::lib 2>&1 | indent
 
 if [ -d $BUILD_DIR/local ]; then
   rm -rf $CACHE_DIR/local
