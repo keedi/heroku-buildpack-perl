@@ -1,50 +1,16 @@
-#!/usr/bin/env bash
-# Usage:
-#
-#     $ bin/compile <build-dir> <cache-dir> <env-path>
-
-# Fail fast and fail hard.
-set -eo pipefail
+#!/bin/sh
 
 indent() {
   sed -u 's/^/       /'
 }
 
-BUILD_DIR=$1
-CACHE_DIR=$2
-ENV_DIR=$3
+echo "-----> Found a hello.txt"
 
-PATH="$BUILD_DIR/local/bin:$PATH"
-
-export PERL5LIB="$BUILD_DIR/local/lib/perl5"
-
-PERL_CPANM_OPT="--quiet --notest -l $BUILD_DIR/local"
-if [ -f $ENV_DIR/PERL_CPANM_OPT ]; then
-  PERL_CPANM_OPT="$PERL_CPANM_OPT $(cat $ENV_DIR/PERL_CPANM_OPT)"
-fi
-export PERL_CPANM_OPT
-
-rm -rf $BUILD_DIR/local
-if [ -d $CACHE_DIR/local ]; then
-  cp -a $CACHE_DIR/local $BUILD_DIR/local
+# if hello.txt is empty, abort the build
+if [ ! -s $1/hello.txt ]; then
+  echo "hello.txt was empty" | indent
+  exit 1
 fi
 
-cd $BUILD_DIR
-
-if ! [ -e $BUILD_DIR/local/bin/cpanm ]; then
-  echo "-----> Bootstrapping cpanm"
-  curl -L --silent https://raw.github.com/miyagawa/cpanminus/master/cpanm | perl - App::cpanminus 2>&1 | indent
-fi
-
-echo "-----> Installing dependencies"
-echo "cpanm options: $PERL_CPANM_OPT" | indent
-cpanm --installdeps . 2>&1 | indent
-
-echo "-----> Installing Starman"
-cpanm Starman 2>&1 | indent
-
-if [ -d $BUILD_DIR/local ]; then
-  rm -rf $CACHE_DIR/local
-  mkdir -p $CACHE_DIR
-  cp -a $BUILD_DIR/local $CACHE_DIR/local
-fi
+# replace hello with goodbye in a new file
+cat $1/hello.txt | sed -e "s/[Hh]ello/Goodbye/g" > $1/goodbye.txt
